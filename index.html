@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080F12">
+<title>Track your repair · பழுது நிலை</title>
+<style>
+:root{--bg:#080F12;--sf:#101F26;--sf2:#172B34;--tx:#E9EFEA;--mu:#8FA5A8;--ac:#5CD1C4;--off:#2B4853;--bad:#F0776B}
+@media (prefers-color-scheme:light){:root{--bg:#F1F7F6;--sf:#fff;--sf2:#E8F0EF;--tx:#10201F;--mu:#5A6F70;--ac:#0F8F84;--off:#D5E1DF}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI","Noto Sans Tamil",Roboto,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:20px 16px}
+main{width:100%;max-width:440px}
+h1{font-size:24px;letter-spacing:-.02em}.sub{color:var(--mu);margin:2px 0 18px}
+.card{background:var(--sf);border-radius:20px;padding:18px;margin-bottom:14px}
+label{font-size:14px;color:var(--mu)}
+input{width:100%;background:var(--sf2);color:var(--tx);border:2px solid transparent;border-radius:14px;padding:14px;font:600 18px ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 12px}
+input:focus{outline:0;border-color:var(--ac)}
+button{width:100%;background:var(--ac);color:#062622;border:0;border-radius:16px;padding:15px;font:700 17px system-ui;cursor:pointer}
+.dev{font-size:22px;font-weight:700}
+.track{display:flex;gap:6px;margin:16px 0 10px}.track i{flex:1;height:10px;border-radius:6px;background:var(--off)}
+.track i.on{background:var(--ac)}
+.st{font-size:20px;font-weight:700;color:var(--ac)}.ta{color:var(--mu)}
+.err{color:var(--bad);font-weight:600}.mu{color:var(--mu);font-size:13px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>Hi-Tech Service Center</h1>
+  <p class="sub">Track your repair · உங்கள் பழுது நிலையைப் பாருங்கள்</p>
+  <div class="card">
+    <label for="code">Tracking code · டிராக்கிங் கோடு</label>
+    <input id="code" placeholder="HT-XXXXXX" autocomplete="off" autocapitalize="characters">
+    <button id="go">Check status · நிலையைப் பார்க்க</button>
+  </div>
+  <div id="res" class="card hide"></div>
+  <p class="mu">We only show your device and its status. · உங்கள் மொபைல் மற்றும் அதன் நிலை மட்டுமே காட்டப்படும்.</p>
+</main>
+<script>
+var DB='https://hitech-service-9883d-default-rtdb.asia-southeast1.firebasedatabase.app';
+var SHOP_PHONE=''; // e.g. '+91 98765 43210' - shown under the result so customers can call you
+var ST={
+ pending:{i:0,en:'Received',ta:'பெறப்பட்டது'},
+ in_progress:{i:1,en:'Repair in progress',ta:'பழுது பார்க்கப்படுகிறது'},
+ ready:{i:2,en:'Ready for pickup',ta:'எடுத்துக்கொள்ளத் தயார்'},
+ delivered:{i:3,en:'Delivered',ta:'ஒப்படைக்கப்பட்டது'},
+ 'return':{i:3,en:'Returned',ta:'திருப்பி அளிக்கப்பட்டது'}
+};
+var $=function(id){return document.getElementById(id)},timer;
+function norm(v){v=(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(v.indexOf('HT')===0)v=v.slice(2);return v?'HT-'+v:''}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function show(html){var r=$('res');r.innerHTML=html;r.classList.remove('hide')}
+function lookup(){
+  var code=norm($('code').value);
+  if(code.length<9){show('<p class="err">Enter the full code from your slip.<br>சீட்டில் உள்ள முழு கோடை உள்ளிடவும்.</p>');return}
+  $('code').value=code;
+  fetch(DB+'/tracking/'+encodeURIComponent(code)+'.json').then(function(r){return r.json()}).then(function(d){
+    if(!d||!d.status){show('<p class="err">Code not found. Please check it.<br>கோடு கிடைக்கவில்லை. சரிபார்க்கவும்.</p>');return}
+    clearTimeout(timer);
+    var phone=SHOP_PHONE?'<p class="mu" style="margin-top:6px">Call · அழைக்க: '+esc(SHOP_PHONE)+'</p>':'';
+    if(d.closed){
+      show('<div class="dev">'+esc(d.device)+'</div><div class="st" style="margin-top:10px">'+(d.status==='return'?'Returned':'Delivered')+'</div>'+
+        '<div class="ta">This tracking link is now closed.<br>இந்த டிராக்கிங் இணைப்பு மூடப்பட்டது.</div>'+phone);
+      return;
+    }
+    var s=Object.prototype.hasOwnProperty.call(ST,d.status)?ST[d.status]:ST.pending,bars='';
+    for(var k=0;k<4;k++)bars+='<i class="'+(k<=s.i?'on':'')+'"></i>';
+    show('<div class="dev">'+esc(d.device)+'</div><div class="track">'+bars+'</div>'+
+      '<div class="st">'+s.en+'</div><div class="ta">'+s.ta+'</div>'+
+      '<p class="mu" style="margin-top:10px">Updated · புதுப்பிக்கப்பட்டது: '+esc(d.updatedAt?new Date(d.updatedAt).toLocaleString():'-')+'</p>'+phone);
+    timer=setTimeout(lookup,60000);
+  }).catch(function(){show('<p class="err">No connection. Try again.<br>இணைப்பு இல்லை. மீண்டும் முயற்சிக்கவும்.</p>')});
+}
+$('go').onclick=lookup;
+$('code').addEventListener('keydown',function(e){if(e.key==='Enter')lookup()});
+var q=new URLSearchParams(location.search).get('c');
+if(q){$('code').value=q;lookup()}
+</script>
+</body>
+</html>
