@@ -2,80 +2,329 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080F12">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070E11">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src https://*.firebasedatabase.app https://*.firebaseio.com; base-uri 'none'; form-action 'none'">
 <title>Track your repair · பழுது நிலை</title>
 <style>
-:root{--bg:#080F12;--sf:#101F26;--sf2:#172B34;--tx:#E9EFEA;--mu:#8FA5A8;--ac:#5CD1C4;--off:#2B4853;--bad:#F0776B}
-@media (prefers-color-scheme:light){:root{--bg:#F1F7F6;--sf:#fff;--sf2:#E8F0EF;--tx:#10201F;--mu:#5A6F70;--ac:#0F8F84;--off:#D5E1DF}}
-*{box-sizing:border-box;margin:0}
-body{background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI","Noto Sans Tamil",Roboto,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:20px 16px}
-main{width:100%;max-width:440px}
-h1{font-size:24px;letter-spacing:-.02em}.sub{color:var(--mu);margin:2px 0 18px}
-.card{background:var(--sf);border-radius:20px;padding:18px;margin-bottom:14px}
-label{font-size:14px;color:var(--mu)}
-input{width:100%;background:var(--sf2);color:var(--tx);border:2px solid transparent;border-radius:14px;padding:14px;font:600 18px ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 12px}
-input:focus{outline:0;border-color:var(--ac)}
-button{width:100%;background:var(--ac);color:#062622;border:0;border-radius:16px;padding:15px;font:700 17px system-ui;cursor:pointer}
-.dev{font-size:22px;font-weight:700}
-.track{display:flex;gap:6px;margin:16px 0 10px}.track i{flex:1;height:10px;border-radius:6px;background:var(--off)}
-.track i.on{background:var(--ac)}
-.st{font-size:20px;font-weight:700;color:var(--ac)}.ta{color:var(--mu)}
-.err{color:var(--bad);font-weight:600}.mu{color:var(--mu);font-size:13px}
-.hide{display:none}
+:root{
+  --bg:#070E11;--sf:#0F1D24;--sf2:#15272F;--ln:#22404A;--tx:#EAF2EF;--mu:#8CA3A7;--ac:#5CD1C4;--ac-ink:#04201C;
+  --amber:#FFC857;--blue:#7CB4FF;--green:#5FE0A0;--violet:#C9A7FF;--red:#FF8A80;
+  --glow:rgba(92,209,196,.16);
+}
+@media (prefers-color-scheme:light){
+  :root{--bg:#F0F6F5;--sf:#FFFFFF;--sf2:#E7F0EF;--ln:#CFE0DD;--tx:#0E1F1E;--mu:#566B6C;--ac:#0B8579;--ac-ink:#FFFFFF;
+    --amber:#9A5A00;--blue:#1D4ED8;--green:#047857;--violet:#6D28D9;--red:#B42318;--glow:rgba(11,133,121,.12)}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);min-height:100vh;
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI","Noto Sans Tamil","Latha",Roboto,sans-serif;
+  background-image:radial-gradient(120% 60% at 50% -10%,var(--glow),transparent 70%);
+  padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));
+  display:flex;justify-content:center}
+main{width:100%;max-width:460px}
+.test{background:var(--amber);color:#1b1200;font-weight:800;font-size:13px;letter-spacing:.04em;text-align:center;
+  padding:8px 12px;border-radius:12px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px;margin:6px 0 22px}
+.logo{width:46px;height:46px;border-radius:14px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(145deg,var(--ac),#2A8F86);box-shadow:0 8px 24px var(--glow)}
+.logo svg{width:26px;height:26px}
+.name{font-weight:800;font-size:18px;letter-spacing:-.01em}
+.tag{color:var(--mu);font-size:13px}
+.panel,.card{background:var(--sf);border:1px solid var(--ln);border-radius:24px;padding:22px;margin-bottom:14px}
+h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;font-weight:800}
+.lead{color:var(--mu);margin:6px 0 20px}
+label{display:block;font-size:13px;font-weight:700;color:var(--mu);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.codebox{display:flex;align-items:center;background:var(--sf2);border:2px solid transparent;border-radius:16px;
+  transition:border-color .15s;margin-bottom:12px}
+.codebox:focus-within{border-color:var(--ac)}
+.pre{padding:0 0 0 16px;font:800 22px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--mu);letter-spacing:.04em}
+input{flex:1;min-width:0;background:transparent;color:var(--tx);border:0;outline:0;padding:16px 16px 16px 4px;
+  font:800 22px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}
+input::placeholder{color:var(--mu);opacity:.5;letter-spacing:.14em}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border:0;border-radius:16px;
+  font:800 17px system-ui,sans-serif;cursor:pointer;text-decoration:none;transition:transform .08s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.6;cursor:default}
+.primary{background:var(--ac);color:var(--ac-ink)}
+.ghost{background:var(--sf2);color:var(--tx);border:1px solid var(--ln)}
+.row{display:flex;gap:10px;margin-top:14px}.row .btn{min-height:50px;font-size:15px}
+.msg{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,138,128,.12);color:var(--red);font-weight:700}
+.msg small{display:block;font-weight:600;opacity:.9}
+.skel{height:14px;border-radius:8px;background:linear-gradient(90deg,var(--sf2),var(--ln),var(--sf2));background-size:200% 100%;
+  animation:sh 1.2s linear infinite;margin:12px 0}
+@keyframes sh{to{background-position:-200% 0}}
+.code{color:var(--mu);font:700 13px ui-monospace,Menlo,monospace;letter-spacing:.08em}
+.dev{font-size:26px;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin:4px 0 16px;word-break:break-word}
+.hero{border-radius:18px;padding:16px;background:var(--sf2);border:1px solid var(--ln);margin-bottom:18px}
+.pill{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:13px;letter-spacing:.03em;
+  padding:6px 12px;border-radius:999px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.hero h2{font-size:20px;line-height:1.25;margin:10px 0 2px;font-weight:800}
+.hero p{color:var(--mu)}
+.hero.ready{border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,var(--sf2))}
+.steps{list-style:none;margin:2px 0 4px}
+.steps li{position:relative;display:flex;gap:14px;padding:0 0 18px}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--ln)}
+.steps li:last-child::before{display:none}
+.steps li.done::before{background:var(--ac)}
+.dot{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--sf2);
+  border:2px solid var(--ln);color:var(--ac-ink)}
+.done .dot{background:var(--ac);border-color:var(--ac)}
+.now .dot{border-color:var(--ac);background:var(--sf);position:relative}
+.now .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--ac);animation:pu 1.6s ease-out infinite}
+@keyframes pu{0%{box-shadow:0 0 0 0 var(--glow)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.dot svg{width:14px;height:14px}
+.st{padding-top:2px}.st b{display:block;font-size:16px}.st span{color:var(--mu);font-size:14px}
+.todo .st b{color:var(--mu);font-weight:600}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px;padding-top:14px;
+  border-top:1px solid var(--ln);color:var(--mu);font-size:13px}
+.live{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--green);animation:bl 2s infinite}
+.live.off i{background:var(--amber);animation:none}
+@keyframes bl{50%{opacity:.35}}
+.closed{text-align:center;padding:10px 4px}
+.closed .big{font-size:44px;line-height:1}
+.closed h2{font-size:22px;margin:12px 0 4px}
+.closed p{color:var(--mu)}
+.again{margin-top:16px}
+footer{color:var(--mu);font-size:13px;text-align:center;padding:6px 8px}
+footer p+p{margin-top:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <main>
-  <h1>Hi-Tech Service Center</h1>
-  <p class="sub">Track your repair · உங்கள் பழுது நிலையைப் பாருங்கள்</p>
-  <div class="card">
+  <div class="test" id="testBanner" hidden>TEST DATA · not real customers</div>
+
+  <header class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#04201C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M9.5 12.5l2 2 3.5-4"/></svg>
+    </div>
+    <div><div class="name" id="shopName"></div><div class="tag">Repair tracking · பழுது நிலை</div></div>
+  </header>
+
+  <section class="panel" id="lookup">
+    <h1>Where is my phone?</h1>
+    <p class="lead">Enter the code printed on your slip.<br>உங்கள் சீட்டில் உள்ள கோடை உள்ளிடவும்.</p>
     <label for="code">Tracking code · டிராக்கிங் கோடு</label>
-    <input id="code" placeholder="HT-XXXXXX" autocomplete="off" autocapitalize="characters">
-    <button id="go">Check status · நிலையைப் பார்க்க</button>
-  </div>
-  <div id="res" class="card hide"></div>
-  <p class="mu">We only show your device and its status. · உங்கள் மொபைல் மற்றும் அதன் நிலை மட்டுமே காட்டப்படும்.</p>
+    <div class="codebox"><span class="pre">HT-</span>
+      <input id="code" inputmode="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="14" placeholder="XXXXXX" aria-label="Tracking code">
+    </div>
+    <button class="btn primary" id="go" type="button">Check status · நிலையைப் பார்க்க</button>
+    <div class="msg" id="msg" role="alert" hidden></div>
+  </section>
+
+  <section id="result" aria-live="polite" hidden></section>
+
+  <footer id="foot">
+    <p>We only show your device name and repair status.<br>உங்கள் மொபைல் பெயர் மற்றும் பழுது நிலை மட்டுமே காட்டப்படும்.</p>
+  </footer>
 </main>
+
 <script>
-var DB='https://v3hit-60894-default-rtdb.asia-southeast1.firebasedatabase.app';
-var SHOP_PHONE=''; // e.g. '+91 98765 43210' - shown under the result so customers can call you
-var ST={
- pending:{i:0,en:'Received',ta:'பெறப்பட்டது'},
- in_progress:{i:1,en:'Repair in progress',ta:'பழுது பார்க்கப்படுகிறது'},
- ready:{i:2,en:'Ready for pickup',ta:'எடுத்துக்கொள்ளத் தயார்'},
- delivered:{i:3,en:'Delivered',ta:'ஒப்படைக்கப்பட்டது'},
- 'return':{i:3,en:'Returned',ta:'திருப்பி அளிக்கப்பட்டது'}
+var CONFIG={
+  db:'https://v3hit-60894-default-rtdb.asia-southeast1.firebasedatabase.app',
+  test:true,
+  shopName:'Hi-Tech Service Center',
+  phone:'',      // e.g. '+91 98765 43210'  (shows a Call button)
+  whatsapp:'',   // digits with country code, e.g. '919876543210'  (shows a WhatsApp button)
+  address:'',    // e.g. '12 Main Road, Town'
+  mapsUrl:'',    // optional Google Maps link (must start with https://)
+  hours:''       // e.g. 'Mon-Sat 10 AM - 8 PM'
 };
-var $=function(id){return document.getElementById(id)},timer;
-function norm(v){v=(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(v.indexOf('HT')===0)v=v.slice(2);return v?'HT-'+v:''}
-function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function show(html){var r=$('res');r.innerHTML=html;r.classList.remove('hide')}
-function lookup(){
-  var code=norm($('code').value);
-  if(code.length<9){show('<p class="err">Enter the full code from your slip.<br>சீட்டில் உள்ள முழு கோடை உள்ளிடவும்.</p>');return}
-  $('code').value=code;
-  fetch(DB+'/tracking/'+encodeURIComponent(code)+'.json').then(function(r){return r.json()}).then(function(d){
-    if(!d||!d.status){show('<p class="err">Code not found. Please check it.<br>கோடு கிடைக்கவில்லை. சரிபார்க்கவும்.</p>');return}
-    clearTimeout(timer);
-    var phone=SHOP_PHONE?'<p class="mu" style="margin-top:6px">Call · அழைக்க: '+esc(SHOP_PHONE)+'</p>':'';
-    if(d.closed){
-      show('<div class="dev">'+esc(d.device)+'</div><div class="st" style="margin-top:10px">'+(d.status==='return'?'Returned':'Delivered')+'</div>'+
-        '<div class="ta">This tracking link is now closed.<br>இந்த டிராக்கிங் இணைப்பு மூடப்பட்டது.</div>'+phone);
-      return;
-    }
-    var s=Object.prototype.hasOwnProperty.call(ST,d.status)?ST[d.status]:ST.pending,bars='';
-    for(var k=0;k<4;k++)bars+='<i class="'+(k<=s.i?'on':'')+'"></i>';
-    show('<div class="dev">'+esc(d.device)+'</div><div class="track">'+bars+'</div>'+
-      '<div class="st">'+s.en+'</div><div class="ta">'+s.ta+'</div>'+
-      '<p class="mu" style="margin-top:10px">Updated · புதுப்பிக்கப்பட்டது: '+esc(d.updatedAt?new Date(d.updatedAt).toLocaleString():'-')+'</p>'+phone);
-    timer=setTimeout(lookup,60000);
-  }).catch(function(){show('<p class="err">No connection. Try again.<br>இணைப்பு இல்லை. மீண்டும் முயற்சிக்கவும்.</p>')});
+
+var STEPS=[
+  {k:'pending',    en:'Received',           ta:'பெறப்பட்டது'},
+  {k:'in_progress',en:'Repair in progress', ta:'பழுது பார்க்கப்படுகிறது'},
+  {k:'ready',      en:'Ready for pickup',   ta:'எடுத்துக்கொள்ளத் தயார்'},
+  {k:'delivered',  en:'Delivered',          ta:'ஒப்படைக்கப்பட்டது'}
+];
+var INFO={
+  pending:    {c:'--amber',en:'Device received',        ta:'மொபைல் பெறப்பட்டது',
+               ben:"We've received your device and will start work soon.",
+               bta:'உங்கள் மொபைல் பெறப்பட்டது. விரைவில் பணி தொடங்கும்.'},
+  in_progress:{c:'--blue', en:'Repair in progress',     ta:'பழுது பார்க்கப்படுகிறது',
+               ben:'Our technician is working on your device.',
+               bta:'எங்கள் தொழில்நுட்ப வல்லுநர் உங்கள் மொபைலில் பணியாற்றுகிறார்.'},
+  ready:      {c:'--green',en:'Ready for pickup!',      ta:'எடுத்துக்கொள்ளத் தயார்!',
+               ben:'Good news! Your device is ready. Please collect it from the shop.',
+               bta:'நல்ல செய்தி! உங்கள் மொபைல் தயார். கடையில் வந்து பெற்றுக்கொள்ளவும்.'}
+};
+
+var $=function(id){return document.getElementById(id)};
+var timer=null,busy=false,shown=false,current='';
+
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function svgCheck(){
+  var s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('viewBox','0 0 24 24');s.setAttribute('fill','none');s.setAttribute('stroke','currentColor');
+  s.setAttribute('stroke-width','3.2');s.setAttribute('stroke-linecap','round');s.setAttribute('stroke-linejoin','round');
+  var p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M5 12.5l4.5 4.5L19 7.5');
+  s.appendChild(p);return s;
 }
-$('go').onclick=lookup;
-$('code').addEventListener('keydown',function(e){if(e.key==='Enter')lookup()});
-var q=new URLSearchParams(location.search).get('c');
-if(q){$('code').value=q;lookup()}
+function has(o,k){return Object.prototype.hasOwnProperty.call(o,k)}
+
+function norm(v){
+  v=(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(v.indexOf('HT')===0)v=v.slice(2);
+  return v.slice(0,6);
+}
+function ago(iso){
+  var t=Date.parse(iso);if(!t)return null;
+  var s=Math.max(0,Math.round((Date.now()-t)/1000));
+  if(s<60)return{en:'just now',ta:'இப்போது'};
+  var m=Math.round(s/60);if(m<60)return{en:m+' min ago',ta:m+' நிமிடம் முன்'};
+  var h=Math.round(m/60);if(h<24)return{en:h+(h===1?' hour ago':' hours ago'),ta:h+' மணி நேரம் முன்'};
+  var d=Math.round(h/24);return{en:d+(d===1?' day ago':' days ago'),ta:d+' நாள் முன்'};
+}
+function setMsg(en,ta){
+  var m=$('msg');m.textContent='';
+  if(!en){m.hidden=true;return}
+  m.appendChild(document.createTextNode(en));
+  m.appendChild(el('small',null,ta));
+  m.hidden=false;
+}
+function actions(code){
+  var row=el('div','row'),n=0;
+  var tel=(CONFIG.phone||'').replace(/[^+\d]/g,'');
+  if(tel){var a=el('a','btn ghost','Call · அழைக்க');a.href='tel:'+tel;row.appendChild(a);n++}
+  var wa=(CONFIG.whatsapp||'').replace(/\D/g,'');
+  if(wa){var w=el('a','btn ghost','WhatsApp');
+    w.href='https://wa.me/'+wa+'?text='+encodeURIComponent('Hi, about my repair '+code);
+    w.rel='noopener';row.appendChild(w);n++}
+  return n?row:null;
+}
+function again(){
+  var b=el('button','btn ghost again','Check another code · வேறு கோடு பார்க்க');b.type='button';
+  b.onclick=function(){
+    clearTimeout(timer);shown=false;current='';$('result').hidden=true;$('lookup').hidden=false;
+    $('code').value='';$('code').focus();
+    if(history.replaceState)history.replaceState(null,'',location.pathname);
+  };
+  return b;
+}
+
+function render(d,code,offline){
+  var box=$('result');box.textContent='';
+  var card=el('div','card');
+  card.appendChild(el('div','code','HT-'+code));
+  card.appendChild(el('div','dev',d.device||'Your device'));
+
+  if(d.closed){
+    var done=d.status==='return';
+    var c=el('div','closed');
+    c.appendChild(el('div','big',done?'↩️':'✅'));
+    c.appendChild(el('h2',null,done?'Device returned':'Repair complete'));
+    c.appendChild(el('p',null,done?'Your device was returned to you.':'Your device was handed over. Thank you for choosing us!'));
+    c.appendChild(el('p',null,done?'உங்கள் மொபைல் உங்களிடம் திருப்பி அளிக்கப்பட்டது.':'உங்கள் மொபைல் ஒப்படைக்கப்பட்டது. எங்களைத் தேர்ந்தெடுத்ததற்கு நன்றி!'));
+    var closedNote=el('p',null,'This tracking link is now closed. · இந்த டிராக்கிங் இணைப்பு மூடப்பட்டது.');
+    closedNote.style.marginTop='12px';closedNote.style.fontSize='13px';c.appendChild(closedNote);
+    card.appendChild(c);
+    box.appendChild(card);
+    var ac0=actions(code);if(ac0){var w0=el('div');w0.appendChild(ac0);box.appendChild(w0)}
+    box.appendChild(again());
+    return;
+  }
+
+  var key=has(INFO,d.status)?d.status:'pending';
+  var info=INFO[key];
+  var hero=el('div','hero'+(key==='ready'?' ready':''));
+  hero.style.setProperty('--c','var('+info.c+')');
+  var pill=el('span','pill');pill.appendChild(el('i'));pill.appendChild(document.createTextNode(info.en+' · '+info.ta));
+  hero.appendChild(pill);
+  hero.appendChild(el('h2',null,info.ben));
+  hero.appendChild(el('p',null,info.bta));
+  card.appendChild(hero);
+
+  var idx=0;for(var i=0;i<STEPS.length;i++)if(STEPS[i].k===key)idx=i;
+  var ol=el('ol','steps');
+  STEPS.forEach(function(s,i){
+    var li=el('li',i<idx?'done':i===idx?'now':'todo');
+    var dot=el('span','dot');if(i<idx)dot.appendChild(svgCheck());
+    var st=el('div','st');st.appendChild(el('b',null,s.en));st.appendChild(el('span',null,s.ta));
+    li.appendChild(dot);li.appendChild(st);ol.appendChild(li);
+  });
+  card.appendChild(ol);
+
+  var meta=el('div','meta');
+  var a=ago(d.updatedAt);
+  var up=el('span',null,a?'Updated '+a.en+' · '+a.ta:'');
+  if(d.updatedAt){var dt=new Date(d.updatedAt);if(!isNaN(dt))up.title=dt.toLocaleString()}
+  var live=el('span','live'+(offline?' off':''));live.appendChild(el('i'));
+  live.appendChild(document.createTextNode(offline?'Offline · retrying':'Live'));
+  meta.appendChild(up);meta.appendChild(live);
+  card.appendChild(meta);
+  box.appendChild(card);
+
+  var ac=actions(code);if(ac)box.appendChild(ac);
+  box.appendChild(again());
+}
+
+function lookup(auto){
+  var code=norm($('code').value||current);
+  if(!auto){
+    if(code.length<6){setMsg('Enter the full code from your slip.','சீட்டில் உள்ள முழு கோடை உள்ளிடவும்.');return}
+    setMsg('');
+  }
+  if(busy)return;busy=true;current=code;
+  $('go').disabled=true;
+  if(!auto&&!shown){
+    var r=$('result');r.textContent='';var sk=el('div','card');
+    sk.appendChild(el('div','skel'));var s2=el('div','skel');s2.style.width='60%';sk.appendChild(s2);
+    r.appendChild(sk);r.hidden=false;
+  }
+  fetch(CONFIG.db+'/tracking/'+encodeURIComponent('HT-'+code)+'.json')
+    .then(function(r){if(!r.ok)throw new Error('http');return r.json()})
+    .then(function(d){
+      busy=false;$('go').disabled=false;
+      if(!d||typeof d.status!=='string'){
+        clearTimeout(timer);shown=false;$('result').hidden=true;$('lookup').hidden=false;
+        setMsg('Code not found. Please check it.','கோடு கிடைக்கவில்லை. சரிபார்க்கவும்.');return;
+      }
+      shown=true;$('lookup').hidden=true;$('result').hidden=false;
+      render(d,code,false);
+      clearTimeout(timer);
+      if(!d.closed)timer=setTimeout(function(){lookup(true)},60000);
+    })
+    .catch(function(){
+      busy=false;$('go').disabled=false;
+      if(shown){
+        var l=document.querySelector('.live');if(l){l.className='live off';l.lastChild.textContent='Offline · retrying'}
+        clearTimeout(timer);timer=setTimeout(function(){lookup(true)},30000);
+      }else{
+        $('result').hidden=true;
+        setMsg('No connection. Try again.','இணைப்பு இல்லை. மீண்டும் முயற்சிக்கவும்.');
+      }
+    });
+}
+
+(function init(){
+  $('shopName').textContent=CONFIG.shopName;
+  document.title='Track your repair · '+CONFIG.shopName;
+  if(CONFIG.test)$('testBanner').hidden=false;
+  var foot=$('foot');
+  if(CONFIG.address||CONFIG.hours){
+    var p=el('p');
+    if(CONFIG.address){
+      if(/^https:\/\//.test(CONFIG.mapsUrl||'')){var a=el('a',null,CONFIG.address);a.href=CONFIG.mapsUrl;a.rel='noopener';a.style.color='inherit';p.appendChild(a)}
+      else p.appendChild(document.createTextNode(CONFIG.address));
+    }
+    if(CONFIG.address&&CONFIG.hours)p.appendChild(el('br'));
+    if(CONFIG.hours)p.appendChild(document.createTextNode(CONFIG.hours));
+    foot.insertBefore(p,foot.firstChild);
+  }
+  $('go').onclick=function(){lookup(false)};
+  $('code').addEventListener('keydown',function(e){if(e.key==='Enter')lookup(false)});
+  $('code').addEventListener('input',function(){var v=norm(this.value);if(this.value!==v)this.value=v});
+  var q=new URLSearchParams(location.search).get('c');
+  if(q){$('code').value=norm(q);if($('code').value.length===6)lookup(false)}
+})();
 </script>
 </body>
 </html>
